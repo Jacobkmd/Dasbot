@@ -2,5 +2,9 @@
 ---
 UpdateConfluenceCalender:
   Jobb1:
-    Confluence_id: "740753409"
+    Confluence_id: 740753409
+    Unit: w
+  Jobb2:
+    Confluence_id: 800948225
+    Unit: d
 ...
