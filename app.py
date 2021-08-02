@@ -24,7 +24,7 @@ def update_confluence_calender_page(confluence_id):
     row = htmlparser.find_row_number(html, column, "B")
     teddy = htmlparser.get_cell_value(html, 0, row)
 
-    print("Dagens bamse er: " + teddy)
+    print("Dagens bamse er den " + str(datetime.datetime.today()) + " er " + teddy)
 
     html = htmlparser.remove_highlightclass(html)
     html = htmlparser.add_highlightclass(html, column)
