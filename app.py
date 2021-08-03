@@ -3,6 +3,7 @@ import config
 import datetime
 from atlassian import Confluence
 import yaml
+import os
 
 
 confluence = Confluence(
@@ -36,8 +37,10 @@ def update_confluence_calender_page(confluence_id, unit):
 
 
 if __name__ == '__main__':
-      
-    with open("jobs.yaml", 'r') as stream:
+
+    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    
+    with open(os.path.join(__location__, 'jobs.yaml'), 'r') as stream:
         data_loaded = yaml.safe_load(stream)
    
         for item in data_loaded['UpdateConfluenceCalender']:
