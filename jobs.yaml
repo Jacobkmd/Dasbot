@@ -10,5 +10,10 @@ UpdateConfluenceCalender:
 
 SearchDomain:
   Jobb1:
-    Domain: 
-    Email: 
+    Domain: sc.no
+    Email: dag.atle@stenstad.com
+
+ChangeJiraIssueTransition:
+  Jobb1:
+    Jql: project=ksi and status = "In Progress"
+    ToStatus: 31

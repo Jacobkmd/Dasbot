@@ -2,7 +2,7 @@ import htmlparser
 import tools
 import config
 import datetime
-from atlassian import Confluence
+from atlassian import Confluence, Jira
 import yaml
 import os
 
@@ -10,6 +10,11 @@ confluence = Confluence(
     url=config.confluence_url,
     username=config.confluence_username,
     password=config.confluence_password)
+
+jira = Jira( 
+    url=config.jira_url,
+    username=config.jira_username,
+    password=config.jira_password)
 
 
 def update_confluence_calender_page(confluence_id, unit):
@@ -52,7 +57,7 @@ if __name__ == '__main__':
             
             html = htmlparser.get_html_from_browser('https://www.webhuset.no/bestillingsskjema/domenesok?coupon-2=&fqdn='+ domain, 3)
             status = htmlparser.get_text_from_tagname(html, 'div', 'col-xs-12 result-text').strip()
-            print(status)
+            print(domain + ": " + status)
 
             if status.find("ledig") != -1:
                 email = jobs['SearchDomain'][job]['Email']
@@ -66,3 +71,14 @@ if __name__ == '__main__':
             name = update_confluence_calender_page(confluence_id, unit)
 
             #dispatchers.append(dispatcher.Dispatcher(job, name))
+
+        for job in jobs['ChangeJiraIssueTransition']:
+            jql = jobs['ChangeJiraIssueTransition'][job]['Jql']
+            to_status = jobs['ChangeJiraIssueTransition'][job]['ToStatus']
+            
+            jira_issues = jira.jql(jql)
+                        
+            for jira_issue in jira_issues["issues"]:
+                jira.set_issue_status_by_transition_id(jira_issue["key"], to_status)
+                print(jira_issue["key"] + " er flyttet..")
+                
