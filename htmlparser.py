@@ -1,4 +1,28 @@
 from bs4 import BeautifulSoup
+from selenium import webdriver
+import time
+
+
+def get_html_from_browser(url, delay):
+
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--remote-debugging-port=9222")
+    options.add_argument('--no-sandbox')
+
+    browser = webdriver.Chrome(chrome_options=options)
+    browser.get(url)
+    time.sleep(delay) 
+    html = browser.page_source
+    browser.quit()
+
+    return html 
+
+
+def get_text_from_tagname(html, tag, name):
+    soup = BeautifulSoup(html, "html.parser")
+    return soup.find(tag, {name}).text
+
 
 def remove_highlightclass(html):
     return html.replace(' data-highlight-colour="#e3fcef"', '').strip()

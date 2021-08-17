@@ -1,10 +1,10 @@
 import htmlparser
+import tools
 import config
 import datetime
 from atlassian import Confluence
 import yaml
 import os
-
 
 confluence = Confluence(
     url=config.confluence_url,
@@ -35,16 +35,34 @@ def update_confluence_calender_page(confluence_id, unit):
 
     confluence.update_page(confluence_id, title, html)
 
+    return teddy
+
 
 if __name__ == '__main__':
-
+    
+    dispatchers = []
+    
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     
     with open(os.path.join(__location__, 'jobs.yaml'), 'r') as stream:
-        data_loaded = yaml.safe_load(stream)
-   
-        for item in data_loaded['UpdateConfluenceCalender']:
-            confluence_id = data_loaded['UpdateConfluenceCalender'][item]['Confluence_id']
-            unit = data_loaded['UpdateConfluenceCalender'][item]['Unit']
+        jobs = yaml.safe_load(stream)
 
-            update_confluence_calender_page(confluence_id, unit)
+        for job in jobs['SearchDomain']:
+            domain = jobs['SearchDomain'][job]['Domain']
+            
+            html = htmlparser.get_html_from_browser('https://www.webhuset.no/bestillingsskjema/domenesok?coupon-2=&fqdn='+ domain, 3)
+            status = htmlparser.get_text_from_tagname(html, 'div', 'col-xs-12 result-text').strip()
+            print(status)
+
+            if status.find("ledig") != -1:
+                email = jobs['SearchDomain'][job]['Email']
+                tools.send_email(email, domain + " er ledig!", "")
+
+                
+        for job in jobs['UpdateConfluenceCalender']:
+            confluence_id = jobs['UpdateConfluenceCalender'][job]['Confluence_id']
+            unit = jobs['UpdateConfluenceCalender'][job]['Unit']
+
+            name = update_confluence_calender_page(confluence_id, unit)
+
+            #dispatchers.append(dispatcher.Dispatcher(job, name))

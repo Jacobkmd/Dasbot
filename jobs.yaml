@@ -7,4 +7,8 @@ UpdateConfluenceCalender:
   Jobb2:
     Confluence_id: 800948225
     Unit: d
-...
+
+SearchDomain:
+  Jobb1:
+    Domain: 
+    Email: 
