@@ -1,46 +1,7 @@
-import htmlparser
-import tools
-import config
-import datetime
-from atlassian import Confluence, Jira
+import dasbot
+
 import yaml
 import os
-
-confluence = Confluence(
-    url=config.confluence_url,
-    username=config.confluence_username,
-    password=config.confluence_password)
-
-jira = Jira( 
-    url=config.jira_url,
-    username=config.jira_username,
-    password=config.jira_password)
-
-
-def update_confluence_calender_page(confluence_id, unit):
-
-    if unit == "w":
-        unit = datetime.date.today().isocalendar()[1]
-    else:
-        unit = datetime.datetime.today().day
-
-    confluence_content = confluence.get_page_by_id(confluence_id, expand="body.storage") 
- 
-    html = confluence_content["body"]["storage"]["value"]
-    title = confluence_content["title"]
-
-    column = htmlparser.find_column_number(html, str(unit))
-    row = htmlparser.find_row_number(html, column, "B")
-    teddy = htmlparser.get_cell_value(html, 0, row)
-
-    print("Dagens bamse er den " + str(datetime.datetime.today()) + " er " + teddy)
-
-    html = htmlparser.remove_highlightclass(html)
-    html = htmlparser.add_highlightclass(html, column)
-
-    confluence.update_page(confluence_id, title, html)
-
-    return teddy
 
 
 if __name__ == '__main__':
@@ -51,8 +12,24 @@ if __name__ == '__main__':
     
     with open(os.path.join(__location__, 'jobs.yaml'), 'r') as stream:
         jobs = yaml.safe_load(stream)
+                
+        for job in jobs['UpdateConfluenceCalender']['ConfluencePages']:
+            confluence_id = jobs['UpdateConfluenceCalender']['ConfluencePages'][job]['Confluence_id']
+            unit = jobs['UpdateConfluenceCalender']['ConfluencePages'][job]['Unit']
+
+            dispatcher = dasbot.update_confluence_calender_page(confluence_id, unit)
+
+            if jobs['UpdateConfluenceCalender']['ConfluencePages'][job]['Include_in_summary_page'] is True:
+                dispatchers.append(Dispatcher(job, dispatcher))
+
+        if jobs['UpdateConfluenceCalender']['Summary_page_id'] is not None:
+            #todo; add dispatchers > 0 
+            confluence_id = jobs['UpdateConfluenceCalender']['Summary_page_id']
+            dasbot.update_confluence_summary_page(confluence_id, dispatchers)
+
 
         for job in jobs['SearchDomain']:
+            break
             domain = jobs['SearchDomain'][job]['Domain']
             
             html = htmlparser.get_html_from_browser('https://www.webhuset.no/bestillingsskjema/domenesok?coupon-2=&fqdn='+ domain, 3)
@@ -61,18 +38,11 @@ if __name__ == '__main__':
 
             if status.find("ledig") != -1:
                 email = jobs['SearchDomain'][job]['Email']
-                tools.send_email(email, domain + " er ledig!", "")
+                dasbot.send_email(email, domain + " er ledig!", "")
 
-                
-        for job in jobs['UpdateConfluenceCalender']:
-            confluence_id = jobs['UpdateConfluenceCalender'][job]['Confluence_id']
-            unit = jobs['UpdateConfluenceCalender'][job]['Unit']
-
-            name = update_confluence_calender_page(confluence_id, unit)
-
-            #dispatchers.append(dispatcher.Dispatcher(job, name))
 
         for job in jobs['ChangeJiraIssueTransition']:
+            break
             jql = jobs['ChangeJiraIssueTransition'][job]['Jql']
             to_status = jobs['ChangeJiraIssueTransition'][job]['ToStatus']
             

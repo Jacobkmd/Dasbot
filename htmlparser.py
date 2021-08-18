@@ -3,7 +3,7 @@ from selenium import webdriver
 import time
 
 
-def get_html_from_browser(url, delay):
+def get_html_from_browser(url, delay=0):
 
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
