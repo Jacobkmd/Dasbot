@@ -3,7 +3,7 @@ import dasbot
 
 from flask import Flask, request, abort
 import logging
-logging.basicConfig(filename='webhook.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(filename='webhook.log')
 
 
 app = Flask(__name__)
@@ -34,4 +34,4 @@ def webhook():
 
 if __name__ == '__main__':
     
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    app.run(debug=True, port=5000, host='0.0.0.0', ssl_context='adhoc')
