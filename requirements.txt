@@ -2,3 +2,4 @@ atlassian-python-api
 beautifulsoup4
 pyyaml
 selenium
+flask
