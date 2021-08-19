@@ -20,7 +20,7 @@ if __name__ == '__main__':
             dispatcher = dasbot.update_confluence_calender_page(confluence_id, unit)
 
             if jobs['UpdateConfluenceCalender']['ConfluencePages'][job]['Include_in_summary_page'] is True:
-                dispatchers.append(Dispatcher(job, dispatcher))
+                dispatchers.append(dasbot.Dispatcher(job, dispatcher))
 
         if jobs['UpdateConfluenceCalender']['Summary_page_id'] is not None:
             #todo; add dispatchers > 0 
@@ -29,11 +29,10 @@ if __name__ == '__main__':
 
 
         for job in jobs['SearchDomain']:
-            break
             domain = jobs['SearchDomain'][job]['Domain']
             
-            html = htmlparser.get_html_from_browser('https://www.webhuset.no/bestillingsskjema/domenesok?coupon-2=&fqdn='+ domain, 3)
-            status = htmlparser.get_text_from_tagname(html, 'div', 'col-xs-12 result-text').strip()
+            html = dasbot.htmlparser.get_html_from_browser('https://www.webhuset.no/bestillingsskjema/domenesok?coupon-2=&fqdn='+ domain, 3)
+            status = dasbot.htmlparser.get_text_from_tagname(html, 'div', 'col-xs-12 result-text').strip()
             print(domain + ": " + status)
 
             if status.find("ledig") != -1:
@@ -42,13 +41,12 @@ if __name__ == '__main__':
 
 
         for job in jobs['ChangeJiraIssueTransition']:
-            break
             jql = jobs['ChangeJiraIssueTransition'][job]['Jql']
             to_status = jobs['ChangeJiraIssueTransition'][job]['ToStatus']
             
-            jira_issues = jira.jql(jql)
+            jira_issues = dasbot.jira.jql(jql)
                         
             for jira_issue in jira_issues["issues"]:
-                jira.set_issue_status_by_transition_id(jira_issue["key"], to_status)
+                dasbot.jira.set_issue_status_by_transition_id(jira_issue["key"], to_status)
                 print(jira_issue["key"] + " er flyttet..")
                 

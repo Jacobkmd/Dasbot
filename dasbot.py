@@ -4,6 +4,7 @@ import htmlparser
 import datetime
 import smtplib
 from email.mime.text import MIMEText
+
 from atlassian import Confluence, Jira
 
 
@@ -63,7 +64,7 @@ def update_confluence_calender_page(confluence_id, unit):
     row = htmlparser.find_row_number(html, column, "B")
     dispatcher = htmlparser.get_cell_value(html, 0, row)
 
-    print("Dagens bamse er den " + str(datetime.datetime.today()) + " er " + dispatchers)
+    print("Dagens bamse er den " + str(datetime.datetime.today()) + " er " + dispatcher)
 
     html = htmlparser.remove_highlightclass(html)
     html = htmlparser.add_highlightclass(html, column)
