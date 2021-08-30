@@ -6,7 +6,7 @@ UpdateConfluenceCalender:
     Team1:
       Confluence_id: 740753409
       Unit: w
-      Include_in_summary_page: False
+      Include_in_summary_page: True
     Team2:
       Confluence_id: 800948225
       Unit: d
